@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 import argparse
 import os.path
-from paramiko import client
+import paramiko
 import json
 import sys
 
-print(sys.version_info.major)
+# print(sys.version_info.major)
 
-config = {'handler' : 'adminhandler.py', 'timeoutsec' : 5 }
+config = {'handler': 'adminhandler.py', 'timeoutsec': 5}
 home = os.path.expanduser('~')
 
-print(os.path.isdir('{}/config.json'.format(home)))
+# print(os.path.isdir('{}/config.json'.format(home)))
 
 json.dump(config, open('{}/config.json'.format(home), 'w'))
 a = json.load(open('{}/config.json'.format(home)))
-print(a['handler'])
+# print(a['handler'])
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--file", help="Informa o arquivo a ser comprimido", default='test.py')
@@ -29,13 +29,18 @@ if not os.path.isfile(args.file):
     print('Arquivo informado não encontrado: ({})'.format(args.file))
     exit(1)
 
-
-
-ssh = client.SSHClient()
-ssh.set_missing_host_key_policy(client.AutoAddPolicy())
+ssh = paramiko.client.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
 ssh.load_system_host_keys()
-ssh.connect('127.0.0.1', compress=True, password='esqueci')
-ssh.invoke_shell()
-stdin, stdout, stderr = ssh.exec_command('cat ~/cdr.sql', get_pty=True)
+try:
+    ssh.connect('127.0.0.1', compress=True, password='esqueci')
+    ssh.invoke_shell()
+    stdin, stdout, stderr = ssh.exec_command('dnf update', get_pty=True)
+except paramiko.ssh_exception.AuthenticationException as e:
+    print('Invalid user or password')
+    exit(1)
+
+for l in stdout.readlines():
+    print(l)
 
 ssh.close()
