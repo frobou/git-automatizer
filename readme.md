@@ -1,0 +1,1 @@
+## Git Automatizer, by Frobou ##
