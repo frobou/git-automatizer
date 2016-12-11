@@ -21,12 +21,12 @@ class FrobouGit(object):
         return True
 
 
-    def pobrema(self):
+    def pobrema(self, path):
         # ssh_cmd = 'ssh -i id_deployment_key'
         # with repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
         #     repo.remotes.origin.fetch()
-        repo = git.Repo(os.getcwd())
-        return repo.tags
+        repo = git.Repo(path)
+        return repo.branches
 
     def update(self, path):
         p = os.getcwd() + '/' + path
