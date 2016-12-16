@@ -20,13 +20,10 @@ class FrobouGit(object):
             return False
         return True
 
-
     def pobrema(self, path):
-        # ssh_cmd = 'ssh -i id_deployment_key'
-        # with repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
-        #     repo.remotes.origin.fetch()
-        repo = git.Repo(path)
-        return repo.branches
+        ssh_cmd = 'ssh -i ~/.ssh/id_rsa git@bitbucket.org'
+        with git.Repo.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
+            git.Repo.clone_from(path, 'apitest')
 
     def update(self, path):
         p = os.getcwd() + '/' + path
