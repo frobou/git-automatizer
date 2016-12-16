@@ -1,1 +1,22 @@
-{}
+{
+  "ispti_dns": {
+    "username": "efepimenta",
+    "protocol": "ssh",
+    "ssh-key": true,
+    "password": "ispti_portal",
+    "remote": "bitbucket"
+  },
+  "frobou-doc-go": {
+    "username": "frobou",
+    "protocol": "https",
+    "ssh-key": false,
+    "remote": "github",
+    "destination": "outra_pasta"
+  },
+  "frobou-db-connect": {
+    "username": "frobou",
+    "protocol": "ssh",
+    "ssh-key": false,
+    "remote": "github"
+  }
+}
