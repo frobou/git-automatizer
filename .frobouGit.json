@@ -1,22 +1,30 @@
 {
-  "ispti_dns": {
-    "username": "efepimenta",
-    "protocol": "ssh",
-    "ssh-key": true,
-    "password": "ispti_portal",
-    "remote": "bitbucket"
-  },
   "frobou-doc-go": {
     "username": "frobou",
-    "protocol": "https",
-    "ssh-key": false,
     "remote": "github",
-    "destination": "outra_pasta"
+    "destination": "outra_pasta",
+    "protocol": "https",
+    "ssh-key": false
+  },
+  "ApiTest": {
+    "username": "frobou",
+    "ssh-key": false,
+    "protocol": "ssh",
+    "destination": "ApiTest",
+    "remote": "bitbucket",
+    "password": "bmFvdGVt"
+  },
+  "ispti_dns": {
+    "username": "efepimenta",
+    "remote": "bitbucket",
+    "password": "key",
+    "ssh-key": false,
+    "protocol": "ssh"
   },
   "frobou-db-connect": {
     "username": "frobou",
-    "protocol": "ssh",
+    "remote": "github",
     "ssh-key": false,
-    "remote": "github"
+    "protocol": "ssh"
   }
 }

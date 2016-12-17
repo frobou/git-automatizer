@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import base64
 import os
 import json
 
 
-class frobouConfig(object):
+class FrobouConfig(object):
     def __init__(self):
         self.config_file = "{0}/{1}".format(os.getcwd(), '.frobouGit.json')
         if not os.path.isfile(self.config_file):
@@ -11,19 +12,29 @@ class frobouConfig(object):
                 json.dump({}, config)
 
     def add_project(self, repo, remote, protocol='ssh', username=None, ssh_key=False, password=None, to_foler=None):
+        if repo.strip() == "":
+            print("{0}repo não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
+            exit(1)
+        if remote.strip() == "":
+            print("{0}remote não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
+            exit(1)
         try:
             with open(self.config_file, 'r+') as config:
                 data = json.load(config)
                 data[repo] = {'remote': remote, 'protocol': protocol, 'username': username, "ssh-key": ssh_key,
-                              'password': password, "destination": to_foler}
+                              'password': base64.b64encode(password), "destination": to_foler}
                 config.seek(0)
                 json.dump(data, config, indent=2, separators=(',', ':'), ensure_ascii=False, sort_keys=False)
                 config.truncate()
+                print("{0}repo adicionado/alterado com sucesso{1}".format('\033[1;32m', '\033[m'))
         except Exception as e:
-            print('Erro adicionando projeto porque {}'.format(e.message))
+            print("{0}Erro adicionando projeto porque: {1}{2}".format('\033[1;31m', e, '\033[m'))
             exit(1)
 
     def remove_project(self, repo):
+        if repo.strip() == "":
+            print("{0}repo não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
+            exit(1)
         try:
             with open(self.config_file, 'r+') as config:
                 data = json.load(config)
@@ -31,6 +42,13 @@ class frobouConfig(object):
                 config.seek(0)
                 json.dump(data, config, indent=2, separators=(',', ':'), ensure_ascii=False, sort_keys=False)
                 config.truncate()
+                print("{0}repo removido com sucesso{1}".format('\033[1;32m', '\033[m'))
         except Exception as e:
-            print('Erro removendo projeto, o nome do repositório está correto?')
+            print("{0}Erro removendo projeto, o nome do repositório está correto?{1}".format('\033[1;31m', '\033[m'))
             exit(1)
+
+    def repo_list(self):
+        with open(self.config_file, 'r+') as config:
+            data = json.load(config)
+            for d in data:
+                print("{0}{1}{2}".format('\033[1;33m', d, '\033[m'))
