@@ -10,6 +10,7 @@ import json
 class FrobouGit(object):
     def __init__(self):
         self.config_file = "{0}/{1}".format(os.getcwd(), '.frobouGit.json')
+        self.__output = {}
         if not os.path.isfile(self.config_file):
             print("{0}Configuração base não foi encontrada{1}".format('\033[1;31m', '\033[m'))
             exit(1)
@@ -59,6 +60,7 @@ class FrobouGit(object):
             exit(1)
 
     def clone(self, components=False):
+        out = {}
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
@@ -70,14 +72,14 @@ class FrobouGit(object):
                     try:
                         git.Repo(folder)
                     except git.exc.InvalidGitRepositoryError as e:
-                        print("{0}Destino {1} já existe e não é um repositório válido{2}".format('\033[1;31m', d,
-                                                                                                 '\033[m'))
-                        pass
+                        out.update({d: "Destino {} já existe e não é um repositório válido".format(d)})
+                        continue
                 # se nao existir, monta a url e clona
                 url = self.switch(data[d]['remote'], d, data[d])
                 if not 'destination' in data[d]:
                     data[d]['destination'] = d
                 self.__clone(url, data[d]['destination'], components)
+        self.__output.update({'clone': out})
 
     def __clone(self, url, dest, components):
         try:
@@ -117,33 +119,44 @@ class FrobouGit(object):
                 base = "{0}".format(os.getcwd())
                 folder = "{0}/{1}".format(base, fld)
                 if not os.path.exists(folder):
-                    print("{0}Destino {1} não existe{2}".format('\033[1;31m', fld, '\033[m'))
+                    out.update({fld: "Destino {} não existe".format(fld)})
                     continue
                 try:
                     # verifica se é um repositorio git
                     repo = git.Repo(folder)
                 except git.exc.InvalidGitRepositoryError as e:
-                    print("{0}Destino {1} existe mas não é um repositório válido{2}".format('\033[1;31m', d,
-                                                                                            '\033[m'))
+                    out.update({fld: "Destino {} existe mas não é um repositório válido".format(fld)})
                     continue
                 # verifica se a pasta nao tem alteracao
                 if repo.is_dirty():
-                    out[d] = "Destino {} tem coisas mudadas".format(fld)
+                    out.update({fld: "Destino {} tem coisas mudadas".format(fld)})
                     continue
-                # compara o hash da origem e destino, assim eu sei que se commit local que nao tem remoto
-                # TODO: comparar todas as branchs, tem erro quando tem outra alem da master
-                g = git.cmd.Git(folder)
-                rem = g.execute(["git", "ls-remote"])
-                loc = g.execute(["git", "rev-parse", 'HEAD'])
-                if rem.split("\t")[0] != loc:
-                    out[d] = "Destino {} tem coisas esquisitas".format(fld)
+                if self.compara(folder):
                     continue
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
+                if not self.compara(folder):
+                    out.update({fld: "Destino {} tem coisas esquisitas".format(fld)})
+                    continue
                 # atualizacao do composer, npm, bower, etc
                 if components:
                     self.__update(d, 'update')
-        return out
+        self.__output.update({'sync': out})
+
+    def compara(self, folder):
+        # compara o hash da origem e destino, assim eu sei que se commit local que nao tem remoto
+        g = git.cmd.Git(folder)
+        # pega a branch atual local
+        local_branch = g.execute(['git', 'symbolic-ref', '--short', '-q', 'HEAD'])
+        # pega o hash da branch atual remota
+        rem = g.execute(["git", "ls-remote"])
+        for head in rem.split("\n"):
+            if 'refs/heads/{}'.format(local_branch) in head:
+                remote_hash = head.split("\t")[0]
+        # pega o hash da branch atual local
+        loc = g.execute(["git", "rev-parse", local_branch])
+        # compara as duas
+        return remote_hash == loc
 
     def __update(self, path, action='install'):
         if action != 'install':
@@ -157,3 +170,6 @@ class FrobouGit(object):
         if os.path.isfile(p + '/bower.json'):
             subprocess.call(['bower', action])
         os.chdir('../')
+
+    def getResult(self):
+        return self.__output
