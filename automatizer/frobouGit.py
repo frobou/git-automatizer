@@ -10,7 +10,6 @@ import json
 class FrobouGit(object):
     def __init__(self):
         self.config_file = "{0}/{1}".format(os.getcwd(), '.frobouGit.json')
-        self.__output = {}
         if not os.path.isfile(self.config_file):
             print("{0}Configuração base não foi encontrada{1}".format('\033[1;31m', '\033[m'))
             exit(1)
@@ -46,21 +45,22 @@ class FrobouGit(object):
         return self.__url_mount('bitbucket.org', name, data)
 
     @classmethod
-    def switch(self, remote, name, data):
+    def switch(self, service, name, data):
         switcher = {
             'github': self.__github,
             'bitbucket': self.__bitbucket
         }
         try:
-            func = switcher.get(remote)
+            func = switcher.get(service)
             return func(name, data)
-        except TypeError as e:
-            print("{0}Remote {1} não foi encontrado{2}".format('\033[1;31m', name, '\033[m'))
-            print(e)
+        except TypeError:
+            print(
+                "{0}Serviço remoto {1} para o reposiorio {2} não foi encontrado{3}".format('\033[1;31m', service, name,
+                                                                                           '\033[m'))
             exit(1)
 
     def clone(self, components=False):
-        out = {}
+        out = []
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
@@ -71,17 +71,19 @@ class FrobouGit(object):
                 if os.path.exists(folder):
                     try:
                         git.Repo(folder)
-                    except git.exc.InvalidGitRepositoryError as e:
-                        out.update({d: "Destino {} já existe e não é um repositório válido".format(d)})
+                    except git.exc.InvalidGitRepositoryError:
+                        out.append({'error': {d: "Destino {} já existe e não é um repositório válido".format(d)}})
                         continue
                 # se nao existir, monta a url e clona
-                url = self.switch(data[d]['remote'], d, data[d])
+                url = self.switch(data[d]['service'], d, data[d])
                 if not 'destination' in data[d]:
                     data[d]['destination'] = d
-                self.__clone(url, data[d]['destination'], components)
-        self.__output.update({'clone': out})
+                dt = self.__clone(url, data[d]['destination'], components)
+                out += dt
+        self.__print_result(out)
 
     def __clone(self, url, dest, components):
+        out = []
         try:
             # faz a clonagem
             git.Repo.clone_from(url=url, to_path=dest)
@@ -97,17 +99,16 @@ class FrobouGit(object):
             # atualizacao do composer, npm, bower, etc
             if components:
                 self.__update(dest)
-            print("{0}Repositório {2} clonado com sucesso{1}".format('\033[1;32m', '\033[m', dest))
-        except git.GitCommandError as e:
-            print("{0}Não consegui clonar o repositorio {2}. Ele já existe?{1}".format('\033[1;31m', '\033[m', dest))
-            return False
-        except AttributeError as a:
-            print("{0}Não consegui clonar o repositorio {2}.{1}".format('\033[1;31m', '\033[m', dest))
-            return False
-        return True
+            # tudo ok, coloca no relatório
+            out.append({'success': {dest: "Repositório {} clonado com sucesso".format(dest)}})
+        except git.GitCommandError:
+            out.append({'error': {dest: "Não consegui clonar o repositorio {}. Ele já existe?".format(dest)}})
+        except AttributeError:
+            out.append({'error': {dest: "Não consegui clonar o repositorio {}".format(dest)}})
+        return out
 
     def sync(self, components=False):
-        out = {}
+        out = []
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
@@ -119,29 +120,31 @@ class FrobouGit(object):
                 base = "{0}".format(os.getcwd())
                 folder = "{0}/{1}".format(base, fld)
                 if not os.path.exists(folder):
-                    out.update({fld: "Destino {} não existe".format(fld)})
+                    out.append({"error": {fld: "Destino {} não existe".format(fld)}})
                     continue
                 try:
                     # verifica se é um repositorio git
                     repo = git.Repo(folder)
-                except git.exc.InvalidGitRepositoryError as e:
-                    out.update({fld: "Destino {} existe mas não é um repositório válido".format(fld)})
+                except git.exc.InvalidGitRepositoryError:
+                    out.append({"error": {fld: "Destino {} existe mas não é um repositório válido".format(fld)}})
                     continue
                 # verifica se a pasta nao tem alteracao
                 if repo.is_dirty():
-                    out.update({fld: "Destino {} tem coisas mudadas".format(fld)})
+                    out.append({"error": {fld: "Destino {} tem coisas mudadas".format(fld)}})
                     continue
                 if self.compara(folder):
+                    out.append({'ok': {"Destino {} já está sincronizado".format(fld)}})
                     continue
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
                 if not self.compara(folder):
-                    out.update({fld: "Destino {} tem coisas esquisitas".format(fld)})
+                    out.append({"error": {fld: "Destino {} tem coisas esquisitas".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
                 if components:
                     self.__update(d, 'update')
-        self.__output.update({'sync': out})
+                out.append({'success': {"Destino {} sincronizado com sucesso".format(fld)}})
+        self.__print_result(out)
 
     def compara(self, folder):
         # compara o hash da origem e destino, assim eu sei que se commit local que nao tem remoto
@@ -153,12 +156,14 @@ class FrobouGit(object):
         for head in rem.split("\n"):
             if 'refs/heads/{}'.format(local_branch) in head:
                 remote_hash = head.split("\t")[0]
+                break
         # pega o hash da branch atual local
         loc = g.execute(["git", "rev-parse", local_branch])
         # compara as duas
         return remote_hash == loc
 
     def __update(self, path, action='install'):
+        print('to comparando')
         if action != 'install':
             action = 'update'
         p = os.getcwd() + '/' + path
@@ -171,5 +176,15 @@ class FrobouGit(object):
             subprocess.call(['bower', action])
         os.chdir('../')
 
-    def getResult(self):
-        return self.__output
+    def __print_result(self, res):
+        print("\n{0}Relatório final:\n{1}".format('\033[1;37m', '\033[m'))
+        for r in res:
+            if 'success' in dict.keys(r):
+                for success in r['success']:
+                    print("{0}{1}{2}".format('\033[1;32m', r['success'][success], '\033[m'))
+            elif 'error' in dict.keys(r):
+                for error in r['error']:
+                    print("{0}{1}{2}".format('\033[1;31m', r['error'][error], '\033[m'))
+            elif 'ok' in dict.keys(r):
+                for ok in r['ok']:
+                    print("{0}{1}{2}".format('\033[1;33m', ok, '\033[m'))

@@ -11,17 +11,17 @@ class FrobouConfig(object):
             with open(self.config_file, 'w') as config:
                 json.dump({}, config)
 
-    def add_project(self, repo, remote, protocol='ssh', username=None, ssh_key=False, password=None, to_foler=None):
+    def add_project(self, repo, service, protocol='ssh', username=None, ssh_key=False, password=None, to_foler=None):
         if repo.strip() == "":
             print("{0}repo não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
             exit(1)
-        if remote.strip() == "":
-            print("{0}remote não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
+        if service.strip() == "":
+            print("{0}service não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
             exit(1)
         try:
             with open(self.config_file, 'r+') as config:
                 data = json.load(config)
-                data[repo] = {'remote': remote, 'protocol': protocol, 'username': username, "ssh-key": ssh_key,
+                data[repo] = {'service': service, 'protocol': protocol, 'username': username, "ssh-key": ssh_key,
                               'password': base64.b64encode(password), "destination": to_foler}
                 config.seek(0)
                 json.dump(data, config, indent=2, separators=(',', ':'), ensure_ascii=False, sort_keys=False)

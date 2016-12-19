@@ -1,7 +1,7 @@
 {
   "frobou-doc-go": {
     "username": "frobou",
-    "remote": "github",
+    "service": "github",
     "destination": "outra_pasta",
     "protocol": "https",
     "ssh-key": false
@@ -11,19 +11,19 @@
     "ssh-key": false,
     "protocol": "ssh",
     "destination": "ApiTest",
-    "remote": "bitbucket",
+    "service": "bitbucket",
     "password": "bmFvdGVt"
   },
   "ispti_dns": {
     "username": "efepimenta",
-    "remote": "bitbucket",
+    "service": "bitbucket",
     "password": "key",
     "ssh-key": false,
     "protocol": "ssh"
   },
   "frobou-db-connect": {
     "username": "frobou",
-    "remote": "github",
+    "service": "github",
     "ssh-key": false,
     "protocol": "ssh"
   }

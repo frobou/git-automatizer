@@ -1,1 +1,3 @@
 http://gitpython.readthedocs.io/en/stable/index.html
+
+pip install gitpython
