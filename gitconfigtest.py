@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import getpass
 
-from automatizer.frobouConfig import FrobouConfig
+from git_automatizer.frobouConfig import FrobouConfig
 
 g = FrobouConfig()
 
