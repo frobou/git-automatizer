@@ -2,3 +2,7 @@
 testes/
 __pycache__/
 *.pyc
+/.frobouGit.json
+/execute.py
+/start.py
+/Leitura

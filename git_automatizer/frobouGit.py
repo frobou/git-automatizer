@@ -20,7 +20,7 @@ class FrobouGit(object):
         user = "{}".format(data['username'])
         if 'password' in data and data['password'] != None:
             try:
-                pwd = base64.b64decode(data['password'])
+                pwd = base64.b64decode(data['password']).decode('utf-8')
             except:
                 pwd = data['password']
             data['protocol'] = 'https'

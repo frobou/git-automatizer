@@ -18,16 +18,19 @@ class FrobouConfig(object):
         if service.strip() == "":
             print("{0}service não pode ser em branco{1}".format('\033[1;31m', '\033[m'))
             exit(1)
+        if to_foler == None:
+            to_foler = repo
         try:
             with open(self.config_file, 'r+') as config:
                 data = json.load(config)
                 data[repo] = {'service': service, 'protocol': protocol, 'username': username, "ssh-key": ssh_key,
-                              'password': base64.b64encode(password), "destination": to_foler}
+                              'password': base64.b64encode(password.encode('utf8')).decode('utf8'),
+                              "destination": to_foler}
                 config.seek(0)
                 json.dump(data, config, indent=2, separators=(',', ':'), ensure_ascii=False, sort_keys=False)
                 config.truncate()
                 print("{0}repo adicionado/alterado com sucesso{1}".format('\033[1;32m', '\033[m'))
-        except Exception as e:
+        except TypeError as e:
             print("{0}Erro adicionando projeto porque: {1}{2}".format('\033[1;31m', e, '\033[m'))
             exit(1)
 
