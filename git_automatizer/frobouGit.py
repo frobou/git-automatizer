@@ -55,7 +55,7 @@ class FrobouGit(object):
             return func(name, data)
         except TypeError:
             print(
-                "{0}Serviço remoto {1} para o reposiorio {2} não foi encontrado{3}".format('\033[1;31m', service, name,
+                "{0}Serviço remoto {1} para o repositório {2} não foi encontrado{3}".format('\033[1;31m', service, name,
                                                                                            '\033[m'))
             exit(1)
 
@@ -64,6 +64,7 @@ class FrobouGit(object):
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
+                print("{0}Iniciando a clonagem do repositório {1}{2}".format('\033[1;34m', d, '\033[m'))
                 # verifica se o dir ja existe
                 base = "{0}".format(os.getcwd())
                 folder = "{0}/{1}".format(base, d)
@@ -112,6 +113,7 @@ class FrobouGit(object):
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
+                print("{0}Iniciando a sincronia do repositório {1}{2}".format('\033[1;34m', d, '\033[m'))
                 # o nome da pasta pode ser diferente do nome do repositorio, isso ajusta esse comportamento
                 fld = d
                 if 'destination' in data[d]:
@@ -130,20 +132,20 @@ class FrobouGit(object):
                     continue
                 # verifica se a pasta nao tem alteracao
                 if repo.is_dirty():
-                    out.append({"error": {fld: "Destino {} tem coisas mudadas".format(fld)}})
+                    out.append({"error": {fld: "Repositório {} tem coisas mudadas".format(fld)}})
                     continue
                 if self.compara(folder):
-                    out.append({'ok': {"Destino {} já está sincronizado".format(fld)}})
+                    out.append({'ok': {"Repositório {} já está sincronizado".format(fld)}})
                     continue
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
                 if not self.compara(folder):
-                    out.append({"error": {fld: "Destino {} tem coisas esquisitas".format(fld)}})
+                    out.append({"error": {fld: "Repositório {} tem coisas esquisitas".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
                 if components:
                     self.__update(d, 'update')
-                out.append({'success': {"Destino {} sincronizado com sucesso".format(fld)}})
+                out.append({'success': {"Repositório {} sincronizado com sucesso".format(fld)}})
         self.__print_result(out)
 
     def compara(self, folder):
@@ -163,9 +165,11 @@ class FrobouGit(object):
         return remote_hash == loc
 
     def __update(self, path, action='install'):
-        print('to comparando')
+        acao = 'instalação'
         if action != 'install':
+            acao = 'atualização'
             action = 'update'
+        print("{0}Fazendo a {1} dos componentes de {2}{3}".format('\033[1;33m', acao, path, '\033[m'))
         p = os.getcwd() + '/' + path
         os.chdir(p)
         if os.path.isfile(p + '/composer.json'):
@@ -177,7 +181,7 @@ class FrobouGit(object):
         os.chdir('../')
 
     def __print_result(self, res):
-        print("\n{0}Relatório final:\n{1}".format('\033[1;37m', '\033[m'))
+        print("\n{0}Relatório final:{1}".format('\033[1;37m', '\033[m'))
         for r in res:
             if 'success' in dict.keys(r):
                 for success in r['success']:
