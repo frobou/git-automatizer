@@ -67,6 +67,7 @@ Pronto, todos os repositórios estão ai (se as credenciais informadas estiverem
 **E agora?**
 
     fgit.sync()
+    
 Qualquer repositório da configuração será sincronizado. O automatizer entra de pasta em pasta fazendo o pull, massssss
 
  - não faz nada se o repositório tiver alguma alteração
