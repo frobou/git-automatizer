@@ -1,8 +1,8 @@
 ## Git-Automatizer, by Frobou
 Se você:
-* leva trabalho pra casa
-* trabalha com git
-* faz push aqui e esquece de fazer pull ali
+ - leva trabalho pra casa
+ - trabalha com git
+ - faz push aqui e esquece de fazer pull ali
 
 Seus problemas acabaram...
 > O git-automatizer cuida de tudo pra mim, é o que dizem.
