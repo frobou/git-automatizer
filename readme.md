@@ -1,7 +1,8 @@
 ## Git-Automatizer, by Frobou
 Se você:
- - leva trabalho pra casa
- - trabalha com git
+
+ - leva trabalho pra casa 
+ - trabalha com git 
  - faz push aqui e esquece de fazer pull ali
 
 Seus problemas acabaram...
@@ -9,7 +10,7 @@ Seus problemas acabaram...
 
 **É simples: adicione projetos na configuração da pasta e seja feliz.**
 
-Cada automatizer-folder tem um arquivo de configuração que indica os repositórios a serem verificados. Voce chega de manhã no trabalho e roda um script...
+Cada automatizer-folder tem um arquivo de configuração que indica os repositórios a serem verificados. Voce chega de manhã no trabalho e roda um script...  
 Adicionar um repositório é fácil:
 
     import getpass
@@ -90,3 +91,4 @@ Não coloquei no pypi, se o projeto amadurecer talvez. Por enquanto tem um arqui
 Todos os testes feitos em python 2 e 3 funcionaram.  
 Claro que devo ter esquecido de algo. Se lembrar eu atualizo.  
 Bom uso.
+
