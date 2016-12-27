@@ -73,6 +73,7 @@ Qualquer repositório da configuração será sincronizado. O automatizer entra 
 
  - não faz nada se o repositório tiver alguma alteração
  - não faz a clonagem se o repositório não existir
+ - não faz nada se o hash local for diferente do hash remoto
  - não faz nada se as credenciais nao conferirem
 
 > Isso é bom, se tiver alterações na pasta eu esqueci de alguma coisa. Vou ter que fazer merge.
