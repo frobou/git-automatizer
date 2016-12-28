@@ -64,7 +64,7 @@ class FrobouGit(object):
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
-                print("{0}Iniciando a clonagem do repositório {1}{2}".format('\033[1;34m', d, '\033[m'))
+                print("{0}Iniciando a clonagem do repositório {1}{2}".format('\033[1;35m', d, '\033[m'))
                 # verifica se o dir ja existe
                 base = "{0}".format(os.getcwd())
                 folder = "{0}/{1}".format(base, d)
@@ -102,8 +102,8 @@ class FrobouGit(object):
                 self.__update(dest)
             # tudo ok, coloca no relatório
             out.append({'success': {dest: "Repositório {} clonado com sucesso".format(dest)}})
-        except git.GitCommandError:
-            out.append({'error': {dest: "Não consegui clonar o repositorio {}. Ele já existe?".format(dest)}})
+        except git.GitCommandError as e:
+            out.append({'error': {dest: "Ou o repositorio {} já existe ou as credenciais estão incorretas".format(dest)}})
         except AttributeError:
             out.append({'error': {dest: "Não consegui clonar o repositorio {}".format(dest)}})
         return out

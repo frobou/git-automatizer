@@ -6,3 +6,6 @@ __pycache__/
 /execute.py
 /start.py
 /Leitura
+/build
+/dist
+/git_automatizer.egg-info
