@@ -132,7 +132,7 @@ class FrobouGit(object):
                     continue
                 # verifica se a pasta nao tem alteracao
                 if repo.is_dirty():
-                    out.append({"error": {fld: "Repositório {} tem coisas mudadas".format(fld)}})
+                    out.append({"error": {fld: "Repositório {} tem alterações pendentes".format(fld)}})
                     continue
                 if self.compara(folder):
                     out.append({'ok': {"Repositório {} já está sincronizado".format(fld)}})
@@ -140,7 +140,7 @@ class FrobouGit(object):
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
                 if not self.compara(folder):
-                    out.append({"error": {fld: "Repositório {} tem coisas esquisitas".format(fld)}})
+                    out.append({"error": {fld: "Última hash do repositório {} local é diferente da hash remota".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
                 if components:
