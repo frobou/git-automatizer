@@ -102,8 +102,8 @@ class FrobouGit(object):
                 self.__update(dest)
             # tudo ok, coloca no relatório
             out.append({'success': {dest: "Repositório {} clonado com sucesso".format(dest)}})
-        except git.GitCommandError as e:
-            out.append({'error': {dest: "Ou o repositorio {} já existe ou as credenciais estão incorretas".format(dest)}})
+        except git.GitCommandError:
+            out.append({'error': {dest: "Repositorio {} já existe ou as credenciais estão incorretas".format(dest)}})
         except AttributeError:
             out.append({'error': {dest: "Não consegui clonar o repositorio {}".format(dest)}})
         return out
@@ -127,6 +127,9 @@ class FrobouGit(object):
                 try:
                     # verifica se é um repositorio git
                     repo = git.Repo(folder)
+                except git.GitCommandError:
+                    out.append({'error': {fld: "Provável credencial incorreta para {}".format(fld)}})
+                    continue
                 except git.exc.InvalidGitRepositoryError:
                     out.append({"error": {fld: "Destino {} existe mas não é um repositório válido".format(fld)}})
                     continue
