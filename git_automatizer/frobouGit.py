@@ -188,10 +188,10 @@ class FrobouGit(object):
         for r in res:
             if 'success' in dict.keys(r):
                 for success in r['success']:
-                    print("{0}{1}{2}".format('\033[1;32m', r['success'][success], '\033[m'))
+                    print("{0}{1}{2}".format('\033[1;32m', success, '\033[m'))
             elif 'error' in dict.keys(r):
                 for error in r['error']:
-                    print("{0}{1}{2}".format('\033[1;31m', r['error'][error], '\033[m'))
+                    print("{0}{1}{2}".format('\033[1;31m', error, '\033[m'))
             elif 'ok' in dict.keys(r):
                 for ok in r['ok']:
                     print("{0}{1}{2}".format('\033[1;33m', ok, '\033[m'))
