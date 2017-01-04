@@ -101,11 +101,11 @@ class FrobouGit(object):
             if components:
                 self.__update(dest)
             # tudo ok, coloca no relatório
-            out.append({'success': {dest: "Repositório {} clonado com sucesso".format(dest)}})
+            out.append({'success': {"Repositório {} clonado com sucesso".format(dest)}})
         except git.GitCommandError:
-            out.append({'error': {dest: "Repositorio {} já existe ou as credenciais estão incorretas".format(dest)}})
+            out.append({'error': {"Repositorio {} já existe ou as credenciais estão incorretas".format(dest)}})
         except AttributeError:
-            out.append({'error': {dest: "Não consegui clonar o repositorio {}".format(dest)}})
+            out.append({'error': {"Não consegui clonar o repositorio {}".format(dest)}})
         return out
 
     def sync(self, components=False):
@@ -122,20 +122,20 @@ class FrobouGit(object):
                 base = "{0}".format(os.getcwd())
                 folder = "{0}/{1}".format(base, fld)
                 if not os.path.exists(folder):
-                    out.append({"error": {fld: "Destino {} não existe".format(fld)}})
+                    out.append({"error": {"Destino {} não existe".format(fld)}})
                     continue
                 try:
                     # verifica se é um repositorio git
                     repo = git.Repo(folder)
                 except git.GitCommandError:
-                    out.append({'error': {fld: "Provável credencial incorreta para {}".format(fld)}})
+                    out.append({'error': {"Provável credencial incorreta para {}".format(fld)}})
                     continue
                 except git.exc.InvalidGitRepositoryError:
-                    out.append({"error": {fld: "Destino {} existe mas não é um repositório válido".format(fld)}})
+                    out.append({"error": {"Destino {} existe mas não é um repositório válido".format(fld)}})
                     continue
                 # verifica se a pasta nao tem alteracao
                 if repo.is_dirty():
-                    out.append({"error": {fld: "Repositório {} tem alterações pendentes".format(fld)}})
+                    out.append({"error": {"Repositório {} tem alterações pendentes".format(fld)}})
                     continue
                 if self.compara(folder):
                     out.append({'ok': {"Repositório {} já está sincronizado".format(fld)}})
@@ -143,7 +143,7 @@ class FrobouGit(object):
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
                 if not self.compara(folder):
-                    out.append({"error": {fld: "Última hash do repositório {} local é diferente da hash remota".format(fld)}})
+                    out.append({"error": {"Última hash do repositório {} local é diferente da hash remota".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
                 if components:
