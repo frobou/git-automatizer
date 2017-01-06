@@ -137,6 +137,8 @@ class FrobouGit(object):
                 if repo.is_dirty():
                     out.append({"error": {"Repositório {} tem alterações pendentes".format(fld)}})
                     continue
+                if components:
+                    self.__update(d, 'update')
                 if self.compara(folder):
                     out.append({'ok': {"Repositório {} já está sincronizado".format(fld)}})
                     continue
@@ -146,8 +148,6 @@ class FrobouGit(object):
                     out.append({"error": {"Última hash do repositório {} local é diferente da hash remota".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
-                if components:
-                    self.__update(d, 'update')
                 out.append({'success': {"Repositório {} sincronizado com sucesso".format(fld)}})
         self.__print_result(out)
 
@@ -173,15 +173,16 @@ class FrobouGit(object):
             acao = 'atualização'
             action = 'update'
         print("{0}Fazendo a {1} dos componentes de {2}{3}".format('\033[1;33m', acao, path, '\033[m'))
-        p = os.getcwd() + '/' + path
-        os.chdir(p)
-        if os.path.isfile(p + '/composer.json'):
+        p = os.getcwd()
+        pat = p + '/' + path
+        os.chdir(pat)
+        if os.path.isfile(pat + '/composer.json'):
             subprocess.call(['composer', action])
-        if os.path.isfile(p + '/package.json'):
+        if os.path.isfile(pat + '/package.json'):
             subprocess.call(['npm', action])
-        if os.path.isfile(p + '/bower.json'):
+        if os.path.isfile(pat + '/bower.json'):
             subprocess.call(['bower', action])
-        os.chdir('../')
+        os.chdir(p)
 
     def __print_result(self, res):
         print("\n{0}Relatório final:{1}".format('\033[1;37m', '\033[m'))
