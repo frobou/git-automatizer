@@ -11,3 +11,9 @@ setup(
     packages=["git_automatizer"],
     install_requires=['gitpython']
 )
+
+'''
+uninstall:
+sudo python setup.py install --record files.txt
+sudo bash -c "cat files.txt | xargs rm -rf"
+'''

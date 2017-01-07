@@ -17,6 +17,9 @@ class FrobouGit(object):
     @classmethod
     # montagem da url final
     def __url_mount(self, service, name, data):
+        if 'username' not in data:
+            print("{0}Username não foi informado{1}".format('\033[1;31m', '\033[m'))
+            exit(1)
         user = "{}".format(data['username'])
         if 'password' in data and data['password'] != None:
             try:
@@ -56,8 +59,14 @@ class FrobouGit(object):
         except TypeError:
             print(
                 "{0}Serviço remoto {1} para o repositório {2} não foi encontrado{3}".format('\033[1;31m', service, name,
-                                                                                           '\033[m'))
+                                                                                            '\033[m'))
             exit(1)
+
+    def __repo_name(self, repo):
+        spl = repo.split('/')
+        if len(spl) > 1:
+            return spl.pop()
+        return repo
 
     def clone(self, components=False):
         out = []
@@ -72,11 +81,23 @@ class FrobouGit(object):
                 if os.path.exists(folder):
                     try:
                         git.Repo(folder)
-                    except git.exc.InvalidGitRepositoryError:
+                    except Exception as e:
                         out.append({'error': {d: "Destino {} já existe e não é um repositório válido".format(d)}})
                         continue
-                # se nao existir, monta a url e clona
-                url = self.switch(data[d]['service'], d, data[d])
+                        # se nao existir, monta a url e clona
+                else:
+                    dirs = d.split('/')
+                    dirs.pop()
+                    ot = ''
+                    for di in dirs:
+                        ot += di + '/'
+                    if not os.path.exists(ot):
+                        os.makedirs(ot)
+
+                if 'service' not in data[d]:
+                    print("{0}Service não foi informado{1}".format('\033[1;31m', '\033[m'))
+                    exit(1)
+                url = self.switch(data[d]['service'], self.__repo_name(d), data[d])
                 if not 'destination' in data[d]:
                     data[d]['destination'] = d
                 dt = self.__clone(url, data[d]['destination'], components)
@@ -95,7 +116,6 @@ class FrobouGit(object):
             for o in origin.refs:
                 b = str(o).split('/')[1]
                 if b not in ['HEAD', 'master']:
-                    print(b)
                     repo.git.checkout(str(o), b=b)
             # atualizacao do composer, npm, bower, etc
             if components:
@@ -145,7 +165,8 @@ class FrobouGit(object):
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
                 repo.remote().pull()
                 if not self.compara(folder):
-                    out.append({"error": {"Última hash do repositório {} local é diferente da hash remota".format(fld)}})
+                    out.append(
+                        {"error": {"Última hash do repositório {} local é diferente da hash remota".format(fld)}})
                     continue
                 # atualizacao do composer, npm, bower, etc
                 out.append({'success': {"Repositório {} sincronizado com sucesso".format(fld)}})
