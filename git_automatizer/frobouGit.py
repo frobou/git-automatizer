@@ -91,7 +91,7 @@ class FrobouGit(object):
                     ot = ''
                     for di in dirs:
                         ot += di + '/'
-                    if not os.path.exists(ot):
+                    if not os.path.exists(ot) and ot != '':
                         os.makedirs(ot)
 
                 if 'service' not in data[d]:
