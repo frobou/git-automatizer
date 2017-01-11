@@ -9,3 +9,4 @@ __pycache__/
 /build
 /dist
 /git_automatizer.egg-info
+.files.txt
