@@ -23,8 +23,12 @@ class FrobouConfig(object):
         try:
             with open(self.config_file, 'r+') as config:
                 data = json.load(config)
+                if ssh_key == False:
+                    pwd = password
+                else:
+                    pwd = base64.b64encode(password.encode('utf8')).decode('utf8')
                 data[repo] = {'service': service, 'protocol': protocol, 'username': username, "ssh-key": ssh_key,
-                              'password': base64.b64encode(password.encode('utf8')).decode('utf8'),
+                              'password': pwd,
                               "destination": to_foler}
                 config.seek(0)
                 json.dump(data, config, indent=2, separators=(',', ':'), ensure_ascii=False, sort_keys=False)
@@ -53,5 +57,6 @@ class FrobouConfig(object):
     def repo_list(self):
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
+            print("\n{0}Repositorios cadastrados:{1}".format('\033[1;37m', '\033[m'))
             for d in data:
                 print("{0}{1}{2}".format('\033[1;33m', d, '\033[m'))

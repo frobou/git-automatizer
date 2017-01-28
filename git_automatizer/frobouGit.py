@@ -68,11 +68,15 @@ class FrobouGit(object):
             return spl.pop()
         return repo
 
-    def clone(self, components=False):
+    def clone(self, components=None, repository=None):
         out = []
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
+                if repository != None:
+                    if d != repository:
+                        continue
+
                 print("{0}Iniciando a clonagem do repositório {1}{2}".format('\033[1;35m', d, '\033[m'))
                 # verifica se o dir ja existe
                 base = "{0}".format(os.getcwd())
@@ -128,11 +132,15 @@ class FrobouGit(object):
             out.append({'error': {"Não consegui clonar o repositorio {}".format(dest)}})
         return out
 
-    def sync(self, components=False):
+    def sync(self, components=None, repository=None):
         out = []
         with open(self.config_file, 'r+') as config:
             data = json.load(config)
             for d in data:
+                if repository != None:
+                    if d != repository:
+                        continue
+
                 print("{0}Iniciando a sincronia do repositório {1}{2}".format('\033[1;34m', d, '\033[m'))
                 # o nome da pasta pode ser diferente do nome do repositorio, isso ajusta esse comportamento
                 fld = d
