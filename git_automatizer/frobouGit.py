@@ -211,6 +211,7 @@ class FrobouGit(object):
             subprocess.call(['npm', action])
         if os.path.isfile(pat + '/bower.json'):
             subprocess.call(['bower', action])
+        print("\n{0}Ok para {1}{2}".format('\033[1;32m', path, '\033[m'))
         os.chdir(p)
 
     def __print_result(self, res):
