@@ -3,6 +3,7 @@ import base64
 import os
 import json
 
+# http://stackoverflow.com/questions/30216662/python-argparse-provide-different-arguments-based-on-parent-argument-value
 
 class FrobouConfig(object):
     def __init__(self):
