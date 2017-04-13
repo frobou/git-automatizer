@@ -171,7 +171,12 @@ class FrobouGit(object):
                     out.append({'ok': {"Repositório {} já está sincronizado".format(fld)}})
                     continue
                 # todas as verificaoes ok, pode pegar os dados (so a branch atual, por enquanto)
-                repo.remote().pull()
+                try:
+                    repo.remote().pull()
+                except Exception as e:
+                    out.append(
+                        {"error": {"Erro fazendo o pull do repositório {0} - {1}".format(fld, e)}})
+                    continue
                 if not self.compara(folder):
                     out.append(
                         {"error": {"Última hash do repositório {} local é diferente da hash remota".format(fld)}})
